@@ -38,6 +38,7 @@ class Picture_decomposition:
                 if name.endswith(self.pics_name):
                     path_list.append(os.path.join(path, name))
                     
+        path_list = sorted(path_list)
         self.num_pics = len(path_list)
         
         return path_list
@@ -55,7 +56,6 @@ class Picture_decomposition:
             pic = pic.resize((self.pic_size, self.pic_size))
             pics_list.append(np.array(pic))
             pic.close()
-            
         
         return np.array(pics_list)
         
@@ -265,12 +265,12 @@ class Picture_decomposition:
             cur_dists = sorted(cur_dists, key=lambda tup: tup[1])
             second_dists.append(cur_dists[1][1])
             
-        eps_0 = np.mean(second_dists)
+        eps_0 = np.mean(second_dists) * 1.5
         self.eps_0 = eps_0
         
         return eps_0
     
-    def recognize(self, pic, show=True, path_to_nofaces=None):
+    def recognize(self, pic, show=False, path_to_nofaces=None):
         
         eps_0 = self.compute_eps_0() if self.eps_0 is None else self.eps_0
         eps_1 = self.compute_eps_1(path_to_nofaces) if self.eps_1 is None else self.eps_1
@@ -301,15 +301,13 @@ class Picture_decomposition:
         eps_f = np.mean([e_f_r, e_f_g, e_f_b])
         
         if eps_f > eps_1:
-            print('Not a face!')
-            return False
+            return 'Not a face!'
         
         dists = self.calc_distances(pic_vector)
         dists_val = np.array([val[1] for val in dists])
         
         if len(dists_val[dists_val < eps_0]) == 0:
-            print('Unknown face!')
-            return False
+            return 'Unknown face!'
         
         dists = sorted(dists, key=lambda tup: tup[1])
         
@@ -324,6 +322,6 @@ class Picture_decomposition:
             print(pred_path)
             plt.imshow(pic)
             
-        return pred_pic_id
+        return str(pred_pic_id)
         
         
