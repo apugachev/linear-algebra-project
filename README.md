@@ -1,1 +1,1 @@
-# linear-algebra-project
+# Facial Recognition with Singular Value Decomposition
